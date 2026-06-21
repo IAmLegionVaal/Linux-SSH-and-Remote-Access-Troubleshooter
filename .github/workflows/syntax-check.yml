@@ -1,0 +1,17 @@
+name: Bash syntax
+
+on:
+  push:
+    paths:
+      - "src/**/*.sh"
+  pull_request:
+    paths:
+      - "src/**/*.sh"
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check scripts
+        run: find src -type f -name '*.sh' -print0 | xargs -0 -r -n1 bash -n
