@@ -135,9 +135,11 @@ run_action() {
   ACTIONS=$((ACTIONS + 1))
   log "$description"
   if $DRY_RUN; then
-    printf 'DRY-RUN:' >> "$LOG"
-    printf ' %q' "$@" >> "$LOG"
-    printf '\n' >> "$LOG"
+    {
+      printf 'DRY-RUN:'
+      printf ' %q' "$@"
+      printf '\n'
+    } >> "$LOG"
     return 0
   fi
   if "$@" >> "$LOG" 2>&1; then
@@ -157,7 +159,11 @@ collect_state() {
       echo "Service unit: $SERVICE_UNIT"
       systemctl status "$SERVICE_UNIT" --no-pager -l 2>&1 || true
       echo
-      "$SSHD_BIN" -t 2>&1 && echo "sshd configuration: valid" || echo "sshd configuration: invalid"
+      if "$SSHD_BIN" -t 2>&1; then
+        echo "sshd configuration: valid"
+      else
+        echo "sshd configuration: invalid"
+      fi
       echo
       "$SSHD_BIN" -T 2>/dev/null | grep -E '^(port|listenaddress|permitrootlogin|passwordauthentication|pubkeyauthentication|authorizedkeysfile) ' || true
       echo
@@ -165,7 +171,9 @@ collect_state() {
       find /etc/ssh/sshd_config.d -maxdepth 1 -type f -printf '%m %u:%g %p\n' 2>/dev/null | sort || true
       find /etc/ssh -maxdepth 1 -type f -name 'ssh_host_*_key*' -printf '%m %u:%g %p\n' 2>/dev/null | sort || true
       echo
-      command -v ss >/dev/null 2>&1 && ss -lntp 2>/dev/null | grep -E '(:22|sshd)' || true
+      if command -v ss >/dev/null 2>&1; then
+        ss -lntp 2>/dev/null | grep -E '(:22|sshd)' || true
+      fi
       echo
       journalctl -u "$SERVICE_UNIT" -n 80 --no-pager 2>&1 || true
     fi
