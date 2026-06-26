@@ -100,7 +100,7 @@ for key in /etc/ssh/ssh_host_*_key; do
   [[ -e "$key" ]] && record_permission "$key" '^600$'
 done
 
-while IFS=: read -r user _ uid _ _ home shell; do
+while IFS=: read -r _user _ uid _ _ home shell; do
   [[ "$uid" -lt 1000 && "$uid" -ne 0 ]] && continue
   [[ "$shell" =~ (nologin|false)$ ]] && continue
   [[ -d "$home/.ssh" ]] && record_permission "$home/.ssh" '^700$'
