@@ -87,7 +87,7 @@ if have sshd; then
   section "Selected security settings" bash -c "sshd -T 2>/dev/null | grep -Ei '^(port|listenaddress|permitrootlogin|passwordauthentication|pubkeyauthentication|permitemptypasswords|maxauthtries|allowusers|allowgroups|denyusers|denygroups|authenticationmethods|usepam)' || true"
 fi
 
-section "Listening sockets" bash -c "ss -ltnp 2>/dev/null | grep -E '(:$PORT[[:space:]]|sshd)' || true"
+section "Listening sockets" bash -c "ss -ltnp 2>/dev/null | grep -E '(:${PORT}[[:space:]]|sshd)' || true"
 section "Authentication failures" bash -c "journalctl --since '$HOURS hours ago' --no-pager 2>/dev/null | grep -Ei 'failed password|authentication failure|invalid user|maximum authentication attempts|connection closed' | tail -n 500 || true"
 
 if have ufw; then section "UFW firewall" ufw status verbose; fi
